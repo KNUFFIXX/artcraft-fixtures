@@ -8,8 +8,8 @@ Small, contributor-original test documents behind bug reports to the [ArtCraft](
 
 | File | Reproduces | Report |
 |---|---|---|
-| `pdfcraft/double_letters_condensed_tz.pdf` | text extraction drops adjacent identical narrow glyphs in condensed text (`Tz` ≤ 80 %) | see issue link in commit history |
-| `pdfcraft/symbolic_truetype_mac_cmap_no_tounicode.pdf` | non-ASCII characters lost: symbolic TrueType, (1,0) cmap only, no `/Encoding`, no `/ToUnicode` | |
-| `pdfcraft/nonsymbolic_truetype_partial_tounicode.pdf` | non-ASCII characters lost: nonsymbolic TrueType, `/ToUnicode` covers 0x20–0x7E only | |
-| `pdfcraft/type3_imagemask_tr2.pdf` (+ `type3tr_compare_150.png`) | Type 3 glyphs drawn bold under text rendering mode 2 | |
-| `pdfcraft/flatten_orphan_field.pdf` | `doc_flatten` keeps a field whose widget is on no page | |
+| `pdfcraft/double_letters_condensed_tz.pdf` | text extraction drops adjacent identical narrow glyphs in condensed text (`Tz` ≤ 80 %) | [storytold/pdfcraft#1467](https://github.com/storytold/pdfcraft/issues/1467) |
+| `pdfcraft/symbolic_truetype_mac_cmap_no_tounicode.pdf` | non-ASCII characters lost: symbolic TrueType, (1,0) cmap only, no `/Encoding`, no `/ToUnicode` | [storytold/pdfcraft#1468](https://github.com/storytold/pdfcraft/issues/1468) |
+| `pdfcraft/nonsymbolic_truetype_partial_tounicode.pdf` | non-ASCII characters lost: nonsymbolic TrueType, `/ToUnicode` covers 0x20–0x7E only | [storytold/pdfcraft#1468](https://github.com/storytold/pdfcraft/issues/1468) |
+| `pdfcraft/type3_imagemask_tr2.pdf` (+ `type3tr_compare_150.png`) | Type 3 glyphs drawn bold under text rendering mode 2 | [storytold/pdfcraft#1469](https://github.com/storytold/pdfcraft/issues/1469) |
+| `pdfcraft/flatten_orphan_field.pdf` | `doc_flatten` keeps a field whose widget is on no page | [storytold/pdfcraft#1470](https://github.com/storytold/pdfcraft/issues/1470) |
