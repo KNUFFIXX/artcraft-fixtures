@@ -1,9 +1,10 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
+- Every JPEG in `lightcraft/` is written by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py) (Python 3; Pillow only for the pixels, the EXIF is built byte by byte so every tag value is explicit): 480×320 colour bars and a grey ramp drawn in code. No real-world content, no personal data.
 - Licence: MIT OR Apache-2.0, at your option (`LICENSE-MIT`, `LICENSE-APACHE`), so each file can be taken into a project's regression tests as is.
 - The reports are tested and written by Claude (Anthropic) on behalf of Udo Funk, who reviews every file and report before it is published.
 
@@ -36,3 +37,13 @@ Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), r
 | `gridcraft/gc_table_header_newline.xlsx` | line break in a table column name (`_x000a_`) became a space and overwrote the header cell (0.5.0) | fixed in 0.6.1, not reported |
 | `gridcraft/gc_legacy_to_array.xlsx`, `gc_legacy_to_array_small.xlsx` | legacy formulas over whole-column names saved as dynamic arrays: Excel 365 grows to 19 GB or crashes on the saved file (writer side of #410) | [storytold/gridcraft#417](https://github.com/storytold/gridcraft/pull/417) (comment) |
 | `gridcraft/gc_shared_image.xlsx` | a picture shared by four sheets is written four times on save | [storytold/gridcraft#985](https://github.com/storytold/gridcraft/issues/985) |
+
+## LightCraft
+
+Found in a run of LightCraft 0.7.1 over 600 real-world photos (13 Oct 2026); every finding is rebuilt by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py).
+
+| File | Reproduces | Report |
+|---|---|---|
+| `lightcraft/lc_gps_placeholder.jpg` | an empty GPS block (refs NUL, every rational 0/0, as Android phones write it without a position fix) is read as 0° N 0° E and written into exports | [storytold/lightcraft#1617](https://github.com/storytold/lightcraft/issues/1617) |
+| `lightcraft/lc_make_model.jpg` | export drops EXIF Make and writes Model as "Canon Canon IXUS 185"; also the landscape example for the export box size (Width & Height vs Dimensions) | [storytold/lightcraft#1618](https://github.com/storytold/lightcraft/issues/1618), [#1620](https://github.com/storytold/lightcraft/issues/1620) |
+| `lightcraft/lc_exposure_0.3s.jpg` … `lc_exposure_3.2s.jpg` | shutter speeds between 1/4 s and 4 s rounded to whole steps, on display and in the exported EXIF/XMP | [storytold/lightcraft#1619](https://github.com/storytold/lightcraft/issues/1619) |
