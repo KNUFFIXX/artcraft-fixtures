@@ -1,6 +1,6 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
@@ -47,3 +47,13 @@ Found in a run of LightCraft 0.7.1 over 600 real-world photos (13 Oct 2026); eve
 | `lightcraft/lc_gps_placeholder.jpg` | an empty GPS block (refs NUL, every rational 0/0, as Android phones write it without a position fix) is read as 0° N 0° E and written into exports | [storytold/lightcraft#1617](https://github.com/storytold/lightcraft/issues/1617) |
 | `lightcraft/lc_make_model.jpg` | export drops EXIF Make and writes Model as "Canon Canon IXUS 185"; also the landscape example for the export box size (Width & Height vs Dimensions) | [storytold/lightcraft#1618](https://github.com/storytold/lightcraft/issues/1618), [#1620](https://github.com/storytold/lightcraft/issues/1620) |
 | `lightcraft/lc_exposure_0.3s.jpg` … `lc_exposure_3.2s.jpg` | shutter speeds between 1/4 s and 4 s rounded to whole steps, on display and in the exported EXIF/XMP | [storytold/lightcraft#1619](https://github.com/storytold/lightcraft/issues/1619) |
+
+## FilmCraft
+
+Found in a run of FilmCraft 0.7.2 (Windows x64) over 92 real-world video files (13 Oct 2026). Every file in `filmcraft/` is written by [`make_fixtures.sh`](filmcraft/make_fixtures.sh) from ffmpeg's built-in test sources (`testsrc2`, `aevalsrc`); no camera footage, no personal data.
+
+| File | Reproduces | Report |
+|---|---|---|
+| `filmcraft/fps30_ms_timestamps.mp4`, `fps60_ms_timestamps.mp4` | frame times rounded to whole milliseconds in a 90 kHz track are read as 30.303 / 58.824 fps; New Sequence From Clip then drops frames | [storytold/filmcraft#1700](https://github.com/storytold/filmcraft/issues/1700) |
+| `filmcraft/surround51_ac3.mp4`, `surround51_eac3.mp4`, `surround51side_aac_pce.mp4` (controls: `surround51_ac3.mov`, `surround51_ac3.mkv`) | 5.1 in MP4 read as stereo: centre, LFE and surrounds silent | [storytold/filmcraft#1701](https://github.com/storytold/filmcraft/issues/1701) |
+| `filmcraft/av1_in_mp4.mp4`, `h264_in_mkv.mkv` | empty pixel format in Media File Properties | [storytold/filmcraft#1702](https://github.com/storytold/filmcraft/issues/1702) |
