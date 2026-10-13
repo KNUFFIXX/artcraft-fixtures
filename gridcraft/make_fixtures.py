@@ -126,7 +126,9 @@ wb = openpyxl.Workbook(); ws = wb.active; ws.title = 'Sort'
 vals = ['x-1', 'x01', 'JO30-WE-1-', 'JO30-WE01-EGH', 'a-b', 'ab', 'AB', 'a c', 'a-c', 'ac', 'Ärger', 'Zebra', 'apfel', 'Apfel', '_x', 'x_', '1', '10', '2']
 for i, v in enumerate(vals, start=1):
     c = ws.cell(row=i, column=1, value=v); c.number_format = '@'
-ws['C1'] = '=SORT(A1:A19)'; ws['E1'] = '=SORTBY(A1:A19,A1:A19,-1)'
+# Excel's file syntax for the dynamic-array functions: SORT lives in the _xlws namespace, SORTBY in _xlfn.
+# Written without the prefixes, GridCraft reads the file but Excel 365 refuses to open it (AC03, 13 Oct 2026).
+ws['C1'] = '=_xlfn._xlws.SORT(A1:A19)'; ws['E1'] = '=_xlfn.SORTBY(A1:A19,A1:A19,-1)'
 ws['G1'] = 'Excel 365 (de-DE) SORT asc: _x | 1 | 10 | 2 | a c | ab | AB | a-b | ac | a-c | apfel | Apfel | Ärger | JO30-WE01-EGH | JO30-WE-1- | x_ | x01 | x-1 | Zebra'
 wb.save(p('gc_sort_collation.xlsx'))
 print('ok')
