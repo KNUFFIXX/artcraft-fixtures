@@ -19,12 +19,12 @@ Small, contributor-original test documents behind bug reports to the [ArtCraft](
 
 ## GridCraft
 
-Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), re-checked on 0.6.1; the report issue in storytold/gridcraft has the overview. Files whose bug is already fixed stay here as regression fixtures.
+Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), re-checked on 0.6.1; [storytold/gridcraft#891](https://github.com/storytold/gridcraft/issues/891) has the overview. Files whose bug is already fixed stay here as regression fixtures.
 
 | File | Reproduces | Report |
 |---|---|---|
-| `gridcraft/gc_coerce_de.xlsx` | text-to-number/date coercion ignores the regional separators (de-DE) | storytold/gridcraft, issue E (number in the table once posted) |
-| `gridcraft/gc_sort_collation.xlsx` | SORT/SORTBY order by code point instead of Excel's locale collation | storytold/gridcraft, issue F |
+| `gridcraft/gc_coerce_de.xlsx` | text-to-number/date coercion ignores the regional separators (de-DE) | [storytold/gridcraft#889](https://github.com/storytold/gridcraft/issues/889) |
+| `gridcraft/gc_sort_collation.xlsx` | SORT/SORTBY order by code point instead of Excel's locale collation | [storytold/gridcraft#890](https://github.com/storytold/gridcraft/issues/890) |
 | `gridcraft/gc_implicit_intersection.xlsx`, `gc_scoped_names.xlsx` | no implicit intersection for legacy formulas: whole-column names/ranges spill or take the first value | [storytold/gridcraft#410](https://github.com/storytold/gridcraft/issues/410) (comment) |
 | `gridcraft/gc_table_thisrow.xlsx` | structured references saved as `[@col]`; Excel refuses (or crashes on) the saved file | [storytold/gridcraft#864](https://github.com/storytold/gridcraft/issues/864), fixed by #869 |
 | `gridcraft/gc_normal_font_arial10.xlsx`, `gc_normal_font_aptos.xlsx` | the workbook's Normal style (cellXfs 0) is replaced by Calibri 11 on open | [storytold/gridcraft#805](https://github.com/storytold/gridcraft/issues/805), fixed by #823 |
