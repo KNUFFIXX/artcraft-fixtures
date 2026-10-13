@@ -2,7 +2,7 @@
 
 Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
-- Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
+- Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by [`gridcraft/make_fixtures.py`](gridcraft/make_fixtures.py) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
 - Licence: MIT OR Apache-2.0, at your option (`LICENSE-MIT`, `LICENSE-APACHE`), so each file can be taken into a project's regression tests as is.
 - The reports are tested and written by Claude (Anthropic) on behalf of Udo Funk, who reviews every file and report before it is published.
@@ -18,6 +18,7 @@ Small, contributor-original test documents behind bug reports to the [ArtCraft](
 | `pdfcraft/flatten_orphan_field.pdf` | `doc_flatten` keeps a field whose widget is on no page | [storytold/pdfcraft#1470](https://github.com/storytold/pdfcraft/issues/1470) |
 | `pdfcraft/tounicode_name_identity_h.pdf`, `type0_identity_no_tounicode.pdf` | no text from a Type 0 / Identity-H font with an embedded TrueType and no usable `/ToUnicode` (the name `/Identity-H`, or none) | [storytold/pdfcraft#1699](https://github.com/storytold/pdfcraft/issues/1699) |
 | `pdfcraft/mask_downscale.pdf` (+ `mask_downscale_compare.png`) | 1-bit stencil masks, 1-bit images and Type 3 bitmap glyphs shrunk at render time; Type 3 glyphs lose strokes below 2:1 | [storytold/pdfcraft#1700](https://github.com/storytold/pdfcraft/issues/1700) |
+| `pdfcraft/jpx_cm_i64max.pdf` (control: `jpx_cm_ok.pdf`) | a JPX image under `cm` with an out-of-range integer panics in hayro-jpeg2000 (divide by zero); found by fuzzing, rebuilt by [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py) | [storytold/pdfcraft#1761](https://github.com/storytold/pdfcraft/issues/1761) |
 
 ## GridCraft
 
