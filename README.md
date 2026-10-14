@@ -6,7 +6,7 @@ Small, contributor-original test documents behind bug reports to the [ArtCraft](
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
 - Every JPEG in `lightcraft/` is written by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py) (Python 3; Pillow only for the pixels, the EXIF is built byte by byte so every tag value is explicit): 480×320 colour bars and a grey ramp drawn in code. No real-world content, no personal data.
 - Licence: MIT OR Apache-2.0, at your option (`LICENSE-MIT`, `LICENSE-APACHE`), so each file can be taken into a project's regression tests as is.
-- The reports are tested and written by Claude (Anthropic) on behalf of Udo Funk, who reviews every file and report before it is published.
+- The reports are tested and written by Claude (Anthropic) and posted for Udo Funk, emotional support human, who reads every report after it goes out; code pull requests still go out only after his review.
 
 ## PdfCraft
 
