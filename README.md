@@ -1,6 +1,6 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
@@ -59,3 +59,14 @@ Found in a run of FilmCraft 0.7.2 (Windows x64) over 92 real-world video files (
 | `filmcraft/av1_in_mp4.mp4`, `h264_in_mkv.mkv` | empty pixel format in Media File Properties | [storytold/filmcraft#1702](https://github.com/storytold/filmcraft/issues/1702) |
 | `filmcraft/scc_tight.srt`, `scc_timing.srt`, `de_test.srt` (+ `scc_tight_filmcraft-0.7.2.scc`, the 0.7.2 output) | SCC/MCC export: a caption that follows the previous one closely pops on late; German text through all caption formats | [storytold/filmcraft#1791](https://github.com/storytold/filmcraft/issues/1791) |
 | `filmcraft/edl/clipA.mov`, `clipB.mov`, `seq25.edl` (written by [`edl/make_edl_fixture.sh`](filmcraft/edl/make_edl_fixture.sh)) | FilmCraft EDL of a 25 fps sequence re-imports at 24 fps | [storytold/filmcraft#1792](https://github.com/storytold/filmcraft/issues/1792) |
+
+## WordCraft
+
+Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documents, compared with Word for Microsoft 365 (14 Oct 2026); re-checked on 0.7.0. Every file in `wordcraft/` is written by [`make_fixtures_wordcraft.py`](wordcraft/make_fixtures_wordcraft.py) with Python's standard library only: minimal hand-written OOXML, no template, nothing created or saved by Word. No real-world content, no personal data.
+
+| File | Reproduces | Report |
+|---|---|---|
+| `wordcraft/nested_fields.docx` | a field nested in another field's code (`IF { REF }`, `= { REF }`) is replaced by its cached result on save | [storytold/wordcraft#1671](https://github.com/storytold/wordcraft/issues/1671) |
+| `wordcraft/date_time_fields.docx` | unlocked `DATE`/`TIME` fields keep their stored result in text and PDF output | [storytold/wordcraft#1672](https://github.com/storytold/wordcraft/issues/1672) |
+| `wordcraft/vml_group_textbox_control.docx`, `vml_group_textbox_overflow.docx` | the second text box of a VML group is not drawn and is lost on save | [storytold/wordcraft#1643](https://github.com/storytold/wordcraft/issues/1643) (comment) |
+| `wordcraft/legacy_form_fields.docx` | legacy form fields (`FORMTEXT`, `FORMCHECKBOX`, `FORMDROPDOWN`) lose their `w:ffData` on save | [storytold/wordcraft#1174](https://github.com/storytold/wordcraft/issues/1174) (comment) |
