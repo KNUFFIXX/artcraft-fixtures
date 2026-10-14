@@ -40,12 +40,12 @@ Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), r
 
 ## LightCraft
 
-Found in a run of LightCraft 0.7.1 over 600 real-world photos (13 Oct 2026); every finding is rebuilt by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py).
+Found in a run of LightCraft 0.7.1 over 600 real-world photos (13 Oct 2026); every finding is rebuilt by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py). Findings from public CC0 raw samples (raw.pixls.us) link those files directly, e.g. [storytold/lightcraft#1671](https://github.com/storytold/lightcraft/issues/1671).
 
 | File | Reproduces | Report |
 |---|---|---|
 | `lightcraft/lc_gps_placeholder.jpg` | an empty GPS block (refs NUL, every rational 0/0, as Android phones write it without a position fix) is read as 0° N 0° E and written into exports | [storytold/lightcraft#1617](https://github.com/storytold/lightcraft/issues/1617) |
-| `lightcraft/lc_make_model.jpg` | export drops EXIF Make and writes Model as "Canon Canon IXUS 185"; also the landscape example for the export box size (Width & Height vs Dimensions) | [storytold/lightcraft#1618](https://github.com/storytold/lightcraft/issues/1618), [#1620](https://github.com/storytold/lightcraft/issues/1620) |
+| `lightcraft/lc_make_model.jpg` | export drops EXIF Make and writes Model as "Canon Canon IXUS 185"; also the opaque example for the export box size (Width & Height vs Dimensions) and for the always-present alpha channel of 8-bit PNG/TIFF/WebP exports | [storytold/lightcraft#1618](https://github.com/storytold/lightcraft/issues/1618), [#1620](https://github.com/storytold/lightcraft/issues/1620), [#1670](https://github.com/storytold/lightcraft/issues/1670) |
 | `lightcraft/lc_exposure_0.3s.jpg` … `lc_exposure_3.2s.jpg` | shutter speeds between 1/4 s and 4 s rounded to whole steps, on display and in the exported EXIF/XMP | [storytold/lightcraft#1619](https://github.com/storytold/lightcraft/issues/1619) |
 
 ## FilmCraft
