@@ -47,6 +47,9 @@ Found in a run of LightCraft 0.7.1 over 600 real-world photos (13 Oct 2026); eve
 | `lightcraft/lc_gps_placeholder.jpg` | an empty GPS block (refs NUL, every rational 0/0, as Android phones write it without a position fix) is read as 0° N 0° E and written into exports | [storytold/lightcraft#1617](https://github.com/storytold/lightcraft/issues/1617) |
 | `lightcraft/lc_make_model.jpg` | export drops EXIF Make and writes Model as "Canon Canon IXUS 185"; also the opaque example for the export box size (Width & Height vs Dimensions) and for the always-present alpha channel of 8-bit PNG/TIFF/WebP exports | [storytold/lightcraft#1618](https://github.com/storytold/lightcraft/issues/1618), [#1620](https://github.com/storytold/lightcraft/issues/1620), [#1670](https://github.com/storytold/lightcraft/issues/1670) |
 | `lightcraft/lc_exposure_0.3s.jpg` … `lc_exposure_3.2s.jpg` | shutter speeds between 1/4 s and 4 s rounded to whole steps, on display and in the exported EXIF/XMP | [storytold/lightcraft#1619](https://github.com/storytold/lightcraft/issues/1619) |
+| `lightcraft/lc_exposure_3-100s.jpg`, `lc_exposure_6-100s.jpg`, `lc_exposure_8-100s.jpg`, `lc_exposure_49-1000s.jpg` (control: `lc_exposure_1-30s.jpg`) | short decimal exposure times (3/100 s, 6/100 s, 8/100 s, 49/1000 s) rounded to the nearest 1/N on import, in the catalog and in the exported EXIF/XMP | [storytold/lightcraft#1619](https://github.com/storytold/lightcraft/issues/1619) (comment) |
+| `lightcraft/lc_mpo_two_images.jpg` | MPO with two different images: checked, LightCraft imports the primary image (no bug found) | — |
+| `lightcraft/lc_icc_gamma18.png`, `lc_icc_gamma18_rgba.png`, `lc_icc_gamma18.jpg` | embedded display profile (gamma 1.8, sampled curves, D65 white point with `chad`): checked, applied exactly for colours inside sRGB (no bug found) | — |
 
 ## FilmCraft
 
