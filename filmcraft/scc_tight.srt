@@ -1,0 +1,8 @@
+1
+00:00:01,000 --> 00:00:02,000
+First caption
+
+2
+00:00:02,240 --> 00:00:05,000
+The second caption is a much longer line of text here
+
