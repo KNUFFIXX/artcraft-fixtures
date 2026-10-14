@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """make_lc_fixtures.py - synthetic LightCraft test fixtures (no personal data, no third-party assets).
-Writes small 480x320 JPEGs (colour bars + grey ramp drawn in code) whose EXIF is built byte by byte,
+Writes small 480x320 images (colour bars + grey ramp drawn in code) whose EXIF and ICC data are built byte by byte,
 so every tag value is explicit. Usage: python3 make_lc_fixtures.py [outdir]   (Pillow only for the pixels)
 
-lc_gps_placeholder.jpg   GPS IFD as Android phones write it without a position fix: refs NUL, every rational 0/0
-lc_make_model.jpg        Make "Canon", Model "Canon IXUS 185" (the model repeats the maker, as Canon writes it)
-lc_exposure_*.jpg        ExposureTime 3/10 ... 32/10 s (third-stop values above 1/4 s)"""
+lc_gps_placeholder.jpg     GPS IFD as Android phones write it without a position fix: refs NUL, every rational 0/0
+lc_make_model.jpg          Make "Canon", Model "Canon IXUS 185" (the model repeats the maker, as Canon writes it)
+lc_exposure_*.jpg          ExposureTime 3/10 ... 32/10 s (third-stop values above 1/4 s)
+lc_exposure_<n>-<d>s.jpg   ExposureTime n/d below 1/4 s as phones write it (3/100, 6/100, 8/100, 49/1000; 1/30 = control)
+lc_mpo_two_images.jpg      MPO (Multi-Picture JPEG, MPF): image 1 = bars + ramp 480x320, image 2 = stripes 240x160
+lc_icc_gamma18.png/.jpg    RGB with an embedded ICC v2 display profile: sRGB primaries, D50 white, TRC gamma 1.8
+lc_icc_gamma18_rgba.png    the same profile in an RGBA PNG (opaque)"""
 import struct, sys, os
 from PIL import Image, ImageDraw
 
@@ -68,6 +72,14 @@ def picture(w=480, h=320):
         d.line([(x, h // 2), (x, h - 1)], fill=(v, v, v))
     return im
 
+def stripes(w=240, h=160):
+    """A clearly different second picture: magenta/green vertical stripes."""
+    im = Image.new('RGB', (w, h), (230, 30, 200))
+    d = ImageDraw.Draw(im)
+    for x in range(0, w, 20):
+        d.rectangle([x, 0, x + 9, h - 1], fill=(30, 200, 60))
+    return im
+
 def save(name, exif):
     p = os.path.join(out, name)
     picture().save(p, 'JPEG', quality=92, exif=exif)
@@ -91,3 +103,47 @@ save('lc_make_model.jpg', tiff_exif([(0x010F, ASCII, s('Canon')), (0x0110, ASCII
 for num, den in [(3, 10), (4, 10), (6, 10), (8, 10), (13, 10), (16, 10), (25, 10), (32, 10)]:
     ex = [e for e in base_exif if e[0] != 0x829A] + [(0x829A, RATIONAL, [(num, den)])]
     save('lc_exposure_%.1fs.jpg' % (num / den), tiff_exif([(0x010F, ASCII, s('Example')), (0x0110, ASCII, s('Camera 1'))], ex))
+
+# 4) Short exposures as phones write them: a decimal fraction that is not 1/N (3/100 s = 0.03 s), plus 1/30 as control.
+for num, den in [(3, 100), (6, 100), (8, 100), (49, 1000), (1, 30)]:
+    ex = [e for e in base_exif if e[0] != 0x829A] + [(0x829A, RATIONAL, [(num, den)])]
+    save('lc_exposure_%d-%ds.jpg' % (num, den), tiff_exif([(0x010F, ASCII, s('Example')), (0x0110, ASCII, s('Phone 1'))], ex))
+
+# 5) Multi-Picture JPEG (MPF, as phones write for depth or gain-map images): two clearly different pictures.
+p = os.path.join(out, 'lc_mpo_two_images.jpg')
+picture().save(p, format='MPO', save_all=True, append_images=[stripes()], quality=92)
+print('wrote', p, os.path.getsize(p), 'bytes')
+
+# 6) ICC v2 display profile built byte by byte: sRGB primaries (Bradford-adapted to D50), TRC gamma 1.8.
+def icc_profile(gamma=1.8, desc='Synthetic RGB display profile, sRGB primaries, gamma 1.8'):
+    def s15(v): return struct.pack('>i', int(round(v * 65536)))
+    def xyz(x, y, z): return b'XYZ ' + b'\x00' * 4 + s15(x) + s15(y) + s15(z)
+    def curv(g): return b'curv' + b'\x00' * 4 + struct.pack('>I', 1) + struct.pack('>H', int(round(g * 256)))
+    def text(t): return b'text' + b'\x00' * 4 + t.encode('ascii') + b'\x00'
+    def desc_tag(t):
+        a = t.encode('ascii') + b'\x00'
+        return b'desc' + b'\x00' * 4 + struct.pack('>I', len(a)) + a + struct.pack('>II', 0, 0) + struct.pack('>HB', 0, 0) + b'\x00' * 67
+    tags = [(b'desc', desc_tag(desc)), (b'cprt', text('No copyright, use freely')), (b'wtpt', xyz(0.9642, 1.0, 0.8249)),
+            (b'rXYZ', xyz(0.4361, 0.2225, 0.0139)), (b'gXYZ', xyz(0.3851, 0.7169, 0.0971)), (b'bXYZ', xyz(0.1431, 0.0606, 0.7141)),
+            (b'rTRC', curv(gamma)), (b'gTRC', curv(gamma)), (b'bTRC', curv(gamma))]
+    base = 128 + 4 + 12 * len(tags)
+    table, data = b'', b''
+    for sig, d in tags:
+        data += b'\x00' * ((-(base + len(data))) % 4)
+        table += sig + struct.pack('>II', base + len(data), len(d))
+        data += d
+    data += b'\x00' * ((-len(data)) % 4)
+    size = base + len(data)
+    hdr = (struct.pack('>I', size) + b'\x00' * 4 + bytes([2, 0x10, 0, 0]) + b'mntr' + b'RGB ' + b'XYZ '
+           + struct.pack('>6H', 2026, 10, 14, 0, 0, 0) + b'acsp' + b'\x00' * 24 + struct.pack('>I', 0)
+           + s15(0.9642) + s15(1.0) + s15(0.8249) + b'\x00' * 48)
+    assert len(hdr) == 128
+    return hdr + struct.pack('>I', len(tags)) + table + data
+
+icc = icc_profile()
+for name, im, fmt, kw in [('lc_icc_gamma18.png', picture(), 'PNG', {}),
+                          ('lc_icc_gamma18_rgba.png', picture().convert('RGBA'), 'PNG', {}),
+                          ('lc_icc_gamma18.jpg', picture(), 'JPEG', {'quality': 95, 'subsampling': 0})]:
+    p = os.path.join(out, name)
+    im.save(p, fmt, icc_profile=icc, **kw)
+    print('wrote', p, os.path.getsize(p), 'bytes')
