@@ -1,6 +1,6 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
@@ -70,3 +70,11 @@ Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documen
 | `wordcraft/date_time_fields.docx` | unlocked `DATE`/`TIME` fields keep their stored result in text and PDF output | [storytold/wordcraft#1672](https://github.com/storytold/wordcraft/issues/1672) |
 | `wordcraft/vml_group_textbox_control.docx`, `vml_group_textbox_overflow.docx` | the second text box of a VML group is not drawn and is lost on save | [storytold/wordcraft#1643](https://github.com/storytold/wordcraft/issues/1643) (comment) |
 | `wordcraft/legacy_form_fields.docx` | legacy form fields (`FORMTEXT`, `FORMCHECKBOX`, `FORMDROPDOWN`) lose their `w:ffData` on save | [storytold/wordcraft#1174](https://github.com/storytold/wordcraft/issues/1174) (comment) |
+
+## EffectCraft
+
+Found while testing EffectCraft 0.9.2 (Windows x64) with real-world phone and camera clips (14 Oct 2026). The files are written by [`make_ms_timescale_fixtures.sh`](effectcraft/make_ms_timescale_fixtures.sh) from ffmpeg's built-in test source (`testsrc2`); no camera footage, no personal data.
+
+| File | Reproduces | Report |
+|---|---|---|
+| `effectcraft/ec_fps30_ms_timescale.mp4`, `ec_fps60_ms_timescale.mp4` | frame times rounded to whole milliseconds are read as 30.303 / 58.824 fps; new comps and renders run at that rate | [storytold/effectcraft#1442](https://github.com/storytold/effectcraft/issues/1442) |
