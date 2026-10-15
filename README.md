@@ -92,6 +92,9 @@ Found while testing EffectCraft 0.9.2 (Windows x64) with real-world phone and ca
 | File | Reproduces | Report |
 |---|---|---|
 | `effectcraft/ec_fps30_ms_timescale.mp4`, `ec_fps60_ms_timescale.mp4` | frame times rounded to whole milliseconds are read as 30.303 / 58.824 fps; new comps and renders run at that rate | [storytold/effectcraft#1442](https://github.com/storytold/effectcraft/issues/1442) |
+| `effectcraft/ec_surround51_eac3.mp4`, `ec_surround51_eac3.mkv`, `ec_stereo_eac3.mp4` (control: `ec_surround51_ac3.mkv`) | E-AC-3 audio renders as silence, with no warning | [storytold/effectcraft#1545](https://github.com/storytold/effectcraft/issues/1545) |
+| `effectcraft/ec_aac_tone440.mkv`, `ec_surround51_aac.mkv` (controls: the `.mp4` copies) | AAC in Matroska: each decoded frame is placed at its millisecond timestamp, so renders crackle | [storytold/effectcraft#1546](https://github.com/storytold/effectcraft/issues/1546) |
+| `effectcraft/ec_surround51_ac3.mp4`, `ec_surround51side_aac_pce.mp4` (controls: `ec_surround51_ac3.mov`, `ec_surround51_ac3.mkv`, `ec_surround51_aac.mp4`) | 5.1 AC-3 in MP4 (and AAC 5.1 with a program config element) renders front left/right only; centre and surrounds dropped | [storytold/effectcraft#1547](https://github.com/storytold/effectcraft/issues/1547) |
 
 ## DeckCraft
 
