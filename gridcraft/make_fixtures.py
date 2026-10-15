@@ -8,7 +8,7 @@
   gc_implicit_intersection.xlsx  legacy formulas (no dynamic-array metadata) over whole-column names and ranges
   gc_scoped_names.xlsx           global names plus sheet-scoped duplicates
   gc_coerce_de.xlsx              text operands with German separators; expected values of a de-DE Excel in D1
-  gc_sort_collation.xlsx         SORT/SORTBY over strings with hyphens, underscores, case and umlauts; Excel's order in G1
+  gc_sort_collation.xlsx         SORT/SORTBY (dynamic arrays, cm + metadata) over strings with hyphens, underscores, case and umlauts; Excel's order in G1
 """
 import os, zipfile, openpyxl
 from openpyxl.worksheet.table import Table, TableStyleInfo, TableColumn, TableFormula
@@ -131,4 +131,22 @@ for i, v in enumerate(vals, start=1):
 ws['C1'] = '=_xlfn._xlws.SORT(A1:A19)'; ws['E1'] = '=_xlfn.SORTBY(A1:A19,A1:A19,-1)'
 ws['G1'] = 'Excel 365 (de-DE) SORT asc: _x | 1 | 10 | 2 | a c | ab | AB | a-b | ac | a-c | apfel | Apfel | Ärger | JO30-WE01-EGH | JO30-WE-1- | x_ | x01 | x-1 | Zebra'
 wb.save(p('gc_sort_collation.xlsx'))
+# Mark C1 and E1 as dynamic-array formulas the way Excel 365 stores them (cm="1", t="array" over the spill range, plus the
+# XLDAPR metadata part). Without that, Excel 365 reads a plain <f> as a legacy formula and opens it as =@SORT(A1:A19), one
+# value (checked 15 Oct 2026, DRACO-AC05) - the earlier version of this file therefore tested spilling, not just collation.
+DA_META = (b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><metadata xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+           b'xmlns:xda="http://schemas.microsoft.com/office/spreadsheetml/2017/dynamicarray"><metadataTypes count="1"><metadataType name="XLDAPR" '
+           b'minSupportedVersion="120000" copy="1" pasteAll="1" pasteValues="1" merge="1" splitFirst="1" rowColShift="1" clearFormats="1" '
+           b'clearComments="1" assign="1" coerce="1" cellMeta="1"/></metadataTypes><futureMetadata name="XLDAPR" count="1"><bk><extLst>'
+           b'<ext uri="{bdbb8cdc-fa1e-496e-a857-3c3f30c029c3}"><xda:dynamicArrayProperties fDynamic="1" fCollapsed="0"/></ext></extLst></bk>'
+           b'</futureMetadata><cellMetadata count="1"><bk><rc t="1" v="0"/></bk></cellMetadata></metadata>')
+patch_parts(p('gc_sort_collation.xlsx'), 'xl/worksheets/sheet1.xml', [
+    (b'<c r="C1"><f>_xlfn._xlws.SORT(A1:A19)</f><v></v></c>', b'<c r="C1" cm="1"><f t="array" ref="C1:C19">_xlfn._xlws.SORT(A1:A19)</f></c>'),
+    (b'<c r="E1"><f>_xlfn.SORTBY(A1:A19,A1:A19,-1)</f><v></v></c>', b'<c r="E1" cm="1"><f t="array" ref="E1:E19">_xlfn.SORTBY(A1:A19,A1:A19,-1)</f></c>')])
+patch_parts(p('gc_sort_collation.xlsx'), 'xl/_rels/workbook.xml.rels', [(b'</Relationships>',
+    b'<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sheetMetadata" Target="metadata.xml" Id="rIdMeta"/></Relationships>')])
+patch_parts(p('gc_sort_collation.xlsx'), '[Content_Types].xml', [(b'</Types>',
+    b'<Override PartName="/xl/metadata.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheetMetadata+xml"/></Types>')])
+with zipfile.ZipFile(p('gc_sort_collation.xlsx'), 'a', zipfile.ZIP_DEFLATED) as z:
+    z.writestr('xl/metadata.xml', DA_META)
 print('ok')
