@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """make_mask_fixtures.py (DRACO-AC03) - synthetic fixtures: 1-bit image masks / 1-bit images downscaled at render time.
 Text bitmap drawn with DejaVu Sans (Bitstream Vera licence) at 300 dpi, placed at 12 pt and 9 pt:
-  (1) /ImageMask true stencil, (2) DeviceGray /BitsPerComponent 1 image, (3) Type3 font with image-mask glyphs (16 px tall)."""
+  (1) /ImageMask true stencil, (2) DeviceGray /BitsPerComponent 1 image, (3) Type3 font with image-mask glyphs (16 px tall).
+--edge writes mask_downscale_edge.pdf (Type3 glyphs in 25 px and 24 px cells shrunk 25 -> 22 and 24 -> 21 px at 96 dpi; see edge())."""
 import zlib, sys
 from PIL import Image, ImageDraw, ImageFont
 
@@ -88,5 +89,70 @@ def main(path):
     root = p.add(f'<< /Type /Catalog /Pages {pages} 0 R >>'.encode())
     p.write(path, root)
 
+def pad(im, w, h):
+    # glyph bitmap centred in a w x h cell, bottom-aligned like the glyphs above
+    cell = Image.new('1', (w, h), 1)
+    cell.paste(im, ((w - im.size[0]) // 2, h - im.size[1]))
+    return cell
+
+def ruler(w, h, k):
+    # w x h glyph whose only ink is a one-pixel vertical stroke in column k (rows 2 .. h-3)
+    im = Image.new('1', (w, h), 1)
+    ImageDraw.Draw(im).line([(k, 2), (k, h - 3)], fill=0)
+    return im
+
+def type3_font(p, glyphs):
+    # glyphs: {char code: 1-bit PIL image}; image-mask glyphs as in main(), 16 glyph px per em
+    procs = {}; widths = {}
+    for code, g in glyphs.items():
+        gw, gh = g.size
+        data = packbits(g, True)
+        procs[code] = p.add((b'<< >>', f'{gw} 0 0 0 {gw} {gh} d1\n{gw} 0 0 {gh} 0 0 cm\nBI /W {gw} /H {gh} /BPC 1 /IM true /Decode [1 0] ID '.encode() + data + b'\nEI'))
+        widths[code] = gw
+    procs[32] = p.add((b'<< >>', b'6 0 0 0 0 0 d1\n')); widths[32] = 6
+    first, last = min(procs), max(procs)
+    wl = ' '.join(str(widths.get(c, 0)) for c in range(first, last + 1))
+    names = ' '.join(f'{c} /g{c}' for c in sorted(procs))
+    cp = ' '.join(f'/g{c} {procs[c]} 0 R' for c in sorted(procs))
+    return p.add(f'<< /Type /Font /Subtype /Type3 /FontBBox [0 0 40 20] /FontMatrix [0.0625 0 0 0.0625 0 0] /CharProcs << {cp} >> /Encoding << /Type /Encoding /Differences [{names}] >> /FirstChar {first} /LastChar {last} /Widths [{wl}] /Resources << >> >>'.encode())
+
+EDGE_TEXT = 'Hamburgefonstiv 0123456789'
+EDGE_DPI = 96
+EDGE_SCALE = 0.86                         # device px per glyph px at EDGE_DPI
+EDGE_TF = EDGE_SCALE * 16 * 72 / EDGE_DPI  # 10.32 pt with the 1/16 FontMatrix
+EDGE_H = 20                                # 20 -> 18 px tall: not an affected pair
+
+def edge(path):
+    """mask_downscale_edge.pdf: Type3 image-mask glyphs in 25 px and 24 px wide cells, shrunk to
+    0.86 device px per glyph px at 96 dpi: 25 -> 22 px (22 * (25 / 22) > 25 in f64) and the
+    control 24 -> 21 px. Rows 1-2: 'ruler' glyphs, glyph k with one 1 px stroke in column k
+    (codes 65 + k). Rows 3-4: the glyphs of main() padded to the cell width."""
+    p = Pdf()
+    helv = p.add(b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
+    fonts = {}
+    for w in (25, 24):
+        fonts[f'R{w}'] = type3_font(p, {65 + k: ruler(w, EDGE_H, k) for k in range(w)})
+        fonts[f'T{w}'] = type3_font(p, {ord(ch): pad(bitmap(ch, 16), w, EDGE_H) for ch in sorted(set(EDGE_TEXT.replace(' ', '')))})
+    cs = b'0 g\n'
+    y = 200
+    rows = [('R25', ''.join(chr(65 + k) for k in range(25)), '1 Type3 ruler glyphs, 25 px cells (25 -> 22 px at 96 dpi)'),
+            ('R24', ''.join(chr(65 + k) for k in range(24)), '2 Type3 ruler glyphs, 24 px cells (24 -> 21 px at 96 dpi, control)'),
+            ('T25', EDGE_TEXT, '3 Type3 text glyphs, 25 px cells (25 -> 22 px at 96 dpi)'),
+            ('T24', EDGE_TEXT, '4 Type3 text glyphs, 24 px cells (24 -> 21 px at 96 dpi, control)')]
+    for font, text, label in rows:
+        cs += f'BT /F1 9 Tf 40 {y + 22} Td ({label}) Tj ET\n'.encode()
+        cs += f'BT /{font} {EDGE_TF:.2f} Tf 40 {y} Td ({text}) Tj ET\n'.encode(); y -= 55
+    content = p.add((b'<< >>', cs))
+    pages_id = len(p.objs) + 2
+    fres = ' '.join(f'/{k} {v} 0 R' for k, v in fonts.items())
+    page = p.add(f'<< /Type /Page /Parent {pages_id} 0 R /MediaBox [0 0 595 240] /Contents {content} 0 R /Resources << /Font << /F1 {helv} 0 R {fres} >> >> >>'.encode())
+    pages = p.add(f'<< /Type /Pages /Kids [{page} 0 R] /Count 1 >>'.encode())
+    assert pages == pages_id
+    root = p.add(f'<< /Type /Catalog /Pages {pages} 0 R >>'.encode())
+    p.write(path, root)
+
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else 'mask_downscale.pdf')
+    if len(sys.argv) > 1 and sys.argv[1] == '--edge':
+        edge(sys.argv[2] if len(sys.argv) > 2 else 'mask_downscale_edge.pdf')
+    else:
+        main(sys.argv[1] if len(sys.argv) > 1 else 'mask_downscale.pdf')
