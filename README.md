@@ -82,6 +82,8 @@ Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documen
 | `wordcraft/date_time_fields.docx` | unlocked `DATE`/`TIME` fields keep their stored result in text and PDF output | [storytold/wordcraft#1672](https://github.com/storytold/wordcraft/issues/1672) |
 | `wordcraft/vml_group_textbox_control.docx`, `vml_group_textbox_overflow.docx` | the second text box of a VML group is not drawn and is lost on save | [storytold/wordcraft#1643](https://github.com/storytold/wordcraft/issues/1643) (comment) |
 | `wordcraft/legacy_form_fields.docx` | legacy form fields (`FORMTEXT`, `FORMCHECKBOX`, `FORMDROPDOWN`) lose their `w:ffData` on save | [storytold/wordcraft#1174](https://github.com/storytold/wordcraft/issues/1174) (comment) |
+| `wordcraft/vml_group_nested.docx` | VML groups nested in a VML group (as PDF-to-Word converters write them): only the first text box survives reading and saving | [storytold/wordcraft#1662](https://github.com/storytold/wordcraft/pull/1662) (comment), [#1643](https://github.com/storytold/wordcraft/issues/1643) |
+| `wordcraft/mail_merge_main_document.docx` | a mail-merge main document loses `w:mailMerge` (data source, query, ODSO) and its `mailMergeSource` relationships on save | [storytold/wordcraft#1034](https://github.com/storytold/wordcraft/issues/1034) (comment) |
 
 ## EffectCraft
 
