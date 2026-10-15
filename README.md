@@ -40,6 +40,12 @@ Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), r
 | `gridcraft/gc_table_header_newline.xlsx` | line break in a table column name (`_x000a_`) became a space and overwrote the header cell (0.5.0) | fixed in 0.6.1, not reported |
 | `gridcraft/gc_legacy_to_array.xlsx`, `gc_legacy_to_array_small.xlsx` | legacy formulas over whole-column names saved as dynamic arrays: Excel 365 grows to 19 GB or crashes on the saved file (writer side of #410) | [storytold/gridcraft#417](https://github.com/storytold/gridcraft/pull/417) (comment) |
 | `gridcraft/gc_shared_image.xlsx` | a picture shared by four sheets is written four times on save | [storytold/gridcraft#985](https://github.com/storytold/gridcraft/issues/985) |
+| `gridcraft/gc_text_cr.xlsx` | a carriage return in cell text (CR LF, lone CR; `_x000D_` in the shared strings) is saved as a raw CR, so Excel and GridCraft read it back as LF | [storytold/gridcraft#1488](https://github.com/storytold/gridcraft/issues/1488) |
+| `gridcraft/gc_cell_info_de.xlsx` | `CELL("filename")` is empty and German info types (`"dateiname"`, `"adresse"`, `"zeile"` …, kept as typed by a German Excel) give `#VALUE!`; the sheet-name formula fails | [storytold/gridcraft#1489](https://github.com/storytold/gridcraft/issues/1489) |
+| `gridcraft/gc_text_codes_de.xlsx` | `TEXT` format codes of a German Excel (`TT.MM.JJJJ`, `TTTT`, `#.##0,00`) are read with the English codes | [storytold/gridcraft#889](https://github.com/storytold/gridcraft/issues/889) (comment) |
+| `gridcraft/gc_formula_whitespace.xlsx` | line breaks and spaces inside formulas (Alt+Enter layout, `LET` one name per line) are removed on save; values unchanged | [storytold/gridcraft#1490](https://github.com/storytold/gridcraft/issues/1490) |
+| `gridcraft/gc_spill_single.xlsx` | the spill operator on a dynamic-array formula that currently returns one value (`ROWS(C1#)`, `SUM(C1#)`) gives `#REF!` | [storytold/gridcraft#1491](https://github.com/storytold/gridcraft/issues/1491) |
+| `gridcraft/gc_sumproduct_if_da.xlsx` | `SUMPRODUCT(IF(ISERROR(…)))` stored as a dynamic array is saved without `cm`, so Excel inserts `@` and shows `#VALUE!` | [storytold/gridcraft#64](https://github.com/storytold/gridcraft/issues/64) (comment) |
 
 ## LightCraft
 
