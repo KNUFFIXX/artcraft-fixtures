@@ -1,6 +1,6 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft, DeckCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
@@ -81,3 +81,12 @@ Found while testing EffectCraft 0.9.2 (Windows x64) with real-world phone and ca
 | File | Reproduces | Report |
 |---|---|---|
 | `effectcraft/ec_fps30_ms_timescale.mp4`, `ec_fps60_ms_timescale.mp4` | frame times rounded to whole milliseconds are read as 30.303 / 58.824 fps; new comps and renders run at that rate | [storytold/effectcraft#1442](https://github.com/storytold/effectcraft/issues/1442) |
+
+## DeckCraft
+
+Found in a run of DeckCraft 0.7.0 (Windows x64) over 12 real-world PowerPoint decks, with every saved deck re-opened in PowerPoint for Microsoft 365 (15 Oct 2026); [storytold/deckcraft#781](https://github.com/storytold/deckcraft/issues/781) has the overview. Every deck in `deckcraft/` is written by [`make_fixtures_deckcraft.py`](deckcraft/make_fixtures_deckcraft.py) (with [`ooxml_deck.py`](deckcraft/ooxml_deck.py)) using Python's standard library only: hand-written PresentationML, no template, nothing created or saved by PowerPoint; the embedded workbook is hand-written SpreadsheetML and the preview a PNG drawn in code. No real-world content, no personal data.
+
+| File | Reproduces | Report |
+|---|---|---|
+| `deckcraft/dc_empty_line_height.pptx` (+ `dc_empty_line_height_deckcraft-0.7.0.png`, the 0.7.0 render) | an empty line inside a paragraph takes the first run's size instead of its own `a:br`/`a:endParaRPr` size | [storytold/deckcraft#780](https://github.com/storytold/deckcraft/issues/780) |
+| `deckcraft/dc_ole_embedded_xlsx.pptx` | an embedded Excel worksheet (`p:oleObj`, `package` part) is saved as a plain picture | [storytold/deckcraft#203](https://github.com/storytold/deckcraft/issues/203) (re-test after 0.7.0) |
