@@ -2,8 +2,8 @@
 
 Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft, DeckCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
-- Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
-- Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
+- Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py), [`make_inline_image_ei.py`](pdfcraft/make_inline_image_ei.py), [`make_condensed_tz.py`](pdfcraft/make_condensed_tz.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
+- Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages) or by [`make_gc_scoreboard_fixtures.py`](gridcraft/make_gc_scoreboard_fixtures.py) (standard library only, hand-written SpreadsheetML). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
 - Every JPEG in `lightcraft/` is written by [`make_lc_fixtures.py`](lightcraft/make_lc_fixtures.py) (Python 3; Pillow only for the pixels, the EXIF is built byte by byte so every tag value is explicit): 480×320 colour bars and a grey ramp drawn in code. No real-world content, no personal data.
 - Licence: MIT OR Apache-2.0, at your option (`LICENSE-MIT`, `LICENSE-APACHE`), so each file can be taken into a project's regression tests as is.
 - The reports are tested and written by Claude (Anthropic) and posted for Udo Funk, emotional support human, who reads every report after it goes out; code pull requests still go out only after his review.
@@ -74,7 +74,7 @@ Found in a run of FilmCraft 0.7.2 (Windows x64) over 92 real-world video files (
 
 ## WordCraft
 
-Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documents, compared with Word for Microsoft 365 (14 Oct 2026); re-checked on 0.7.0. Every file in `wordcraft/` is written by [`make_fixtures_wordcraft.py`](wordcraft/make_fixtures_wordcraft.py) with Python's standard library only: minimal hand-written OOXML, no template, nothing created or saved by Word. No real-world content, no personal data.
+Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documents, compared with Word for Microsoft 365 (14 Oct 2026); re-checked on 0.7.0; corpus run of 0.7.0 over 400 files: [storytold/wordcraft#2029](https://github.com/storytold/wordcraft/issues/2029). Every file in `wordcraft/` is written by [`make_fixtures_wordcraft.py`](wordcraft/make_fixtures_wordcraft.py) with Python's standard library only: minimal hand-written OOXML, no template, nothing created or saved by Word. No real-world content, no personal data.
 
 | File | Reproduces | Report |
 |---|---|---|
@@ -87,7 +87,7 @@ Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documen
 
 ## EffectCraft
 
-Found while testing EffectCraft 0.9.2 (Windows x64) with real-world phone and camera clips (14 Oct 2026). The files are written by [`make_ms_timescale_fixtures.sh`](effectcraft/make_ms_timescale_fixtures.sh) from ffmpeg's built-in test source (`testsrc2`); no camera footage, no personal data.
+Found while testing EffectCraft 0.9.2 and 0.10.0 (Windows x64) with real-world phone and camera clips (14–15 Oct 2026); [storytold/effectcraft#1548](https://github.com/storytold/effectcraft/issues/1548) has the overview of the 0.10.0 corpus run. The files are written by [`make_ms_timescale_fixtures.sh`](effectcraft/make_ms_timescale_fixtures.sh) and [`make_audio_fixtures.sh`](effectcraft/make_audio_fixtures.sh) from ffmpeg's built-in test sources (`testsrc2`, `aevalsrc`); no camera footage, no personal data.
 
 | File | Reproduces | Report |
 |---|---|---|
