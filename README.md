@@ -1,6 +1,6 @@
 # artcraft-fixtures
 
-Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft, DeckCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
+Small, contributor-original test documents behind bug reports to the [ArtCraft](https://getartcraft.com) projects (PdfCraft, GridCraft, LightCraft, FilmCraft, WordCraft, EffectCraft, DeckCraft, VectorCraft), from the testing setup of Udo Funk ([@KNUFFIXX](https://github.com/KNUFFIXX)): real-world documents are used to *find* problems, and every problem that gets reported is rebuilt here as a synthetic file.
 
 - Every PDF in `pdfcraft/` is written by a script in the same folder: [`make_fixtures.py`](pdfcraft/make_fixtures.py), [`make_mask_fixtures.py`](pdfcraft/make_mask_fixtures.py), [`make_tounicode_name.py`](pdfcraft/make_tounicode_name.py), [`make_jpx_cm_overflow.py`](pdfcraft/make_jpx_cm_overflow.py), [`make_fuzz_rebuilds.py`](pdfcraft/make_fuzz_rebuilds.py), [`make_inline_image_ei.py`](pdfcraft/make_inline_image_ei.py), [`make_condensed_tz.py`](pdfcraft/make_condensed_tz.py) (Python 3 + fontTools, Pillow). Fonts and images: the standard-14 Helvetica (never embedded), subsets of DejaVu Sans (Bitstream Vera licence), hand-drawn 8×14 bitmaps and bitmaps rendered from DejaVu Sans. No real-world content, no personal data.
 - Every workbook in `gridcraft/` is written by a script in the same folder ([`make_fixtures.py`](gridcraft/make_fixtures.py), [`make_gc_legacy_to_array.py`](gridcraft/make_gc_legacy_to_array.py), [`make_gc_shared_image.py`](gridcraft/make_gc_shared_image.py)) (Python 3 + openpyxl 3.1; two files are hand-written OOXML packages) or by [`make_gc_scoreboard_fixtures.py`](gridcraft/make_gc_scoreboard_fixtures.py) (standard library only, hand-written SpreadsheetML). Expected values are the ones a Microsoft 365 Excel (de-DE) computes, measured through COM, and are written into each file next to the test cells. No real-world content, no personal data.
@@ -104,3 +104,15 @@ Found in a run of DeckCraft 0.7.0 (Windows x64) over 12 real-world PowerPoint de
 |---|---|---|
 | `deckcraft/dc_empty_line_height.pptx` (+ `dc_empty_line_height_deckcraft-0.7.0.png`, the 0.7.0 render) | an empty line inside a paragraph takes the first run's size instead of its own `a:br`/`a:endParaRPr` size | [storytold/deckcraft#780](https://github.com/storytold/deckcraft/issues/780) |
 | `deckcraft/dc_ole_embedded_xlsx.pptx` | an embedded Excel worksheet (`p:oleObj`, `package` part) is saved as a plain picture | [storytold/deckcraft#203](https://github.com/storytold/deckcraft/issues/203) (re-test after 0.7.0) |
+
+## VectorCraft
+
+Synthetic fixtures for storytold/vectorcraft, written from the MS-WMF and ISO 32000 specifications by `vectorcraft/make_fixtures_vectorcraft.py` (Python 3 standard library; no Office or Adobe program involved). Expected values come from Windows GDI+ (WMF) and Poppler `pdftoppm`/`pdftotext` (PDF).
+
+| File | Issue | What it shows |
+|---|---|---|
+| `vectorcraft/wmf_window_ext.wmf` | storytold/vectorcraft#2673 | placeable WMF, window extent 4000×2000 on a 1000×500 box: the red rectangle must cover the middle of the picture |
+| `vectorcraft/wmf_window_org.wmf` | storytold/vectorcraft#2673 | placeable WMF, window origin 10000,20000: same expected picture |
+| `vectorcraft/pdf_zero_width_lines.pdf` | storytold/vectorcraft#2674 | two `0 w` lines and a `0 w` box outline (hairlines) next to two 1 pt control lines |
+| `vectorcraft/pdf_invisible_text.pdf` | storytold/vectorcraft#2675 | two lines of invisible text (`3 Tr`, an OCR-style layer) over a grey box plus one visible caption |
+| `vectorcraft/make_fixtures_vectorcraft.py` | – | generator, MIT OR Apache-2.0 |
