@@ -1,0 +1,35 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842]  /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 209 >>
+stream
+0.85 g 50 400 495 300 re f
+BT 3 Tr 0 g /F1 24 Tf 70 600 Td (Invisible OCR layer line one) Tj 0 -40 Td (Invisible OCR layer line two) Tj ET
+BT 0 Tr 0 g /F1 18 Tf 70 300 Td (Visible caption below the box) Tj ET
+
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000242 00000 n 
+0000000502 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+599
+%%EOF
