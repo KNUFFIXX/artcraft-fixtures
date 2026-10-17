@@ -12,6 +12,17 @@ Writes into the current folder:
   mp3_mf320_left.mp3    noise_left_44k.wav as 320 kbps MP3 from the Windows Media Foundation MP3 encoder (ffmpeg -c:a mp3_mf, Windows only;
                         no Xing/Info frame, no ID3): in many frames the left channel uses all main data and the last right-channel
                         granule is empty (part2_3_length 0)
+  he_aac_v1_stereo.m4a  HE-AAC v1 (AAC-LC + SBR), 48 kHz output, stereo, 4.14 s; MP4 sample entry and timescale say 24000 (core rate)
+  he_aac_v2_ps.m4a      HE-AAC v2 (SBR + parametric stereo), 48 kHz output, stereo, 4.18 s; sample entry 24000
+  he_aac_v1_sr48k.m4a   he_aac_v1_stereo.m4a remuxed by ffmpeg (-c copy): the sample entry now says 48000 (the output rate), as most muxers write it
+  he_aac_v2_sr48k.m4a   he_aac_v2_ps.m4a remuxed the same way
+                        The two HE-AAC sources are NOT made by this script (no HE-AAC encoder in ffmpeg builds without libfdk_aac).
+                        They were encoded on Linux with fdkaac 1.0.0 against libfdk-aac built from https://github.com/mstorsjo/fdk-aac
+                        (implicit SBR signalling), from tone_stereo_48k.wav = 440 Hz for 2 s then 880 Hz for 2 s, 48 kHz, 16-bit,
+                        the same mono signal on both channels:
+                          fdkaac -p 5  -b 48000 -S -o he_aac_v1_stereo.m4a tone_stereo_48k.wav
+                          fdkaac -p 29 -b 24000 -S -o he_aac_v2_ps.m4a     tone_stereo_48k.wav
+                        With both files in the current folder this script writes the two *_sr48k.m4a remuxes (any OS).
 Usage: python make_fixtures_soundcraft.py [path to ffmpeg]   (tested with ffmpeg 9.0.2)
 """
 import math
@@ -67,6 +78,13 @@ def noise_left():
         w.writeframes(bytes(frames))
 
 
+def he_aac_remux(common, flags):
+    import os
+    for src, dst in (('he_aac_v1_stereo.m4a', 'he_aac_v1_sr48k.m4a'), ('he_aac_v2_ps.m4a', 'he_aac_v2_sr48k.m4a')):
+        if os.path.isfile(src):
+            subprocess.run(common + ['-i', src, '-c', 'copy', '-map_metadata', '-1'] + flags[2:4] + [dst], check=True)
+
+
 def main():
     ff = sys.argv[1] if len(sys.argv) > 1 else 'ffmpeg'
     write_wav('tone_mono_48k.wav', [tone(440.0)])
@@ -78,6 +96,7 @@ def main():
     subprocess.run(common + ['-i', 'tone_51_48k.wav', '-c:a', 'ac3', '-b:a', '448k'] + flags + ['ac3_51.ac3'], check=True)
     subprocess.run(common + ['-i', 'tone_51_48k.wav', '-c:a', 'eac3', '-b:a', '384k'] + flags + ['eac3_51.eac3'], check=True)
     noise_left()
+    he_aac_remux(common, flags)
     if sys.platform == 'win32':
         subprocess.run(common + ['-i', 'noise_left_44k.wav', '-c:a', 'mp3_mf', '-b:a', '320k', '-write_xing', '0', '-id3v2_version', '0']
                        + flags + ['mp3_mf320_left.mp3'], check=True)
