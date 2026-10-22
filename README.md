@@ -25,6 +25,7 @@ Small, contributor-original test documents behind bug reports to the [ArtCraft](
 | `pdfcraft/inline_image_ei_lookahead.pdf` (+ `inline_image_ei_lookahead_p1_compare.png`, page 1 in PdfCraft 0.8.0 and pdftoppm; written by [`make_inline_image_ei.py`](pdfcraft/make_inline_image_ei.py)) | after an inline image, a byte above 0x7F followed by a later "EI" hides the rest of the page (not drawn, no text) | [storytold/pdfcraft#2456](https://github.com/storytold/pdfcraft/issues/2456) |
 | `pdfcraft/condensed_tz_ocr.pdf` (written by [`make_condensed_tz.py`](pdfcraft/make_condensed_tz.py)) | text extraction drops doubled and repeated letters in text condensed to `Tz` 20 % or less (OCR text layers) | [storytold/pdfcraft#2457](https://github.com/storytold/pdfcraft/issues/2457) |
 | `pdfcraft/mask_downscale_edge.pdf` (+ `mask_downscale_edge_compare.png`; generator `make_mask_fixtures.py --edge`) | ruler glyphs of 25 px drawn 21.5 px wide: a size pair where the averaging in PR #2288 falls back to picking (control: 24 px) | [storytold/pdfcraft#1700](https://github.com/storytold/pdfcraft/issues/1700) (comment on [PR #2288](https://github.com/storytold/pdfcraft/pull/2288)) |
+| `pdfcraft/flatten_empty_field_no_ap.pdf` (written by [`make_flatten_empty_field_no_ap.py`](pdfcraft/make_flatten_empty_field_no_ap.py), reportlab + pypdf) | `doc_flatten` keeps empty text fields that have no appearance stream (control: an empty field with an appearance) | [storytold/pdfcraft#4017](https://github.com/storytold/pdfcraft/issues/4017) |
 
 ## GridCraft
 
