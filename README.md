@@ -86,6 +86,7 @@ Found in a run of WordCraft 0.6.1 (Windows x64) over 499 real-world Word documen
 | `wordcraft/legacy_form_fields.docx` | legacy form fields (`FORMTEXT`, `FORMCHECKBOX`, `FORMDROPDOWN`) lose their `w:ffData` on save | [storytold/wordcraft#1174](https://github.com/storytold/wordcraft/issues/1174) (comment) |
 | `wordcraft/vml_group_nested.docx` | VML groups nested in a VML group (as PDF-to-Word converters write them): only the first text box survives reading and saving | [storytold/wordcraft#1662](https://github.com/storytold/wordcraft/pull/1662) (comment), [#1643](https://github.com/storytold/wordcraft/issues/1643) |
 | `wordcraft/mail_merge_main_document.docx` | a mail-merge main document loses `w:mailMerge` (data source, query, ODSO) and its `mailMergeSource` relationships on save | [storytold/wordcraft#1034](https://github.com/storytold/wordcraft/issues/1034) (comment) |
+| `wordcraft/picture_only_lines_single.docx`, `picture_only_lines_auto115.docx`, `picture_only_lines_atleast.docx`, `picture_only_lines_mark20.docx`, `picture_lines_with_text.docx` (control) | Word 365 probes for the room below a line that holds only an inline picture: none at single and at-least spacing, about 2 pt at 1.15, the text's descent when text shares the line; written by [`make_picture_only_lines.py`](wordcraft/make_picture_only_lines.py) (standard library only) | [storytold/wordcraft#1172](https://github.com/storytold/wordcraft/pull/1172) (comment) |
 
 ## EffectCraft
 
