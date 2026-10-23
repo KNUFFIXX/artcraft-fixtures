@@ -48,6 +48,7 @@ Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), r
 | `gridcraft/gc_formula_whitespace.xlsx` | line breaks and spaces inside formulas (Alt+Enter layout, `LET` one name per line) are removed on save; values unchanged | [storytold/gridcraft#1490](https://github.com/storytold/gridcraft/issues/1490) |
 | `gridcraft/gc_spill_single.xlsx` | the spill operator on a dynamic-array formula that currently returns one value (`ROWS(C1#)`, `SUM(C1#)`) gives `#REF!` | [storytold/gridcraft#1491](https://github.com/storytold/gridcraft/issues/1491) |
 | `gridcraft/gc_sumproduct_if_da.xlsx` | `SUMPRODUCT(IF(ISERROR(…)))` stored as a dynamic array is saved without `cm`, so Excel inserts `@` and shows `#VALUE!` | [storytold/gridcraft#64](https://github.com/storytold/gridcraft/issues/64) (comment) |
+| `gridcraft/gc_table_filter_da.xlsx` | a dynamic-array formula in a table column (`FILTER` with `[@Key]`, stored as Excel 365 stores it) that returns one value shows `#SPILL!` (0.11.1; 0.10.0 correct); written by [`make_gc_table_dynamic_array.py`](gridcraft/make_gc_table_dynamic_array.py) | [storytold/gridcraft#2335](https://github.com/storytold/gridcraft/issues/2335) |
 
 ## LightCraft
 
