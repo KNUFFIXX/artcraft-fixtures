@@ -5,6 +5,9 @@ Measured in Word for Microsoft 365 (Windows 11, ExportAsFixedFormat): every pict
 space after (18 pt) below the previous one, i.e. a picture-only line keeps no descent under the picture,
 in single, 1.15 (auto) and at-least spacing and with a 20 pt paragraph mark; with text on the picture's line
 the text's descent stays (about 2.95 pt for Calibri 11 pt).
+Exact and at-least spacing probes (*_exact*, *_atleast160*): no paragraph before, so the first picture line starts
+at the top margin (70.85 pt) and every line is exactly / at least its spacing value tall; the measurement is where
+the picture's bottom sits above the line's bottom edge.
 Usage: python3 make_picture_only_lines.py [output folder]"""
 import zipfile, zlib, struct, sys
 
@@ -27,8 +30,9 @@ PPR = '<w:pPr><w:spacing w:after="360" w:line="240" w:lineRule="auto"/></w:pPr>'
 def para(inner, ppr=PPR): return '<w:p>' + ppr + inner + '</w:p>'
 def text(t): return '<w:r><w:t xml:space="preserve">%s</w:t></w:r>' % t
 
-def build(path, n=4, h_pt=140, ppr=None, mark_sz=None, with_text=False):
-    body = para(text('Paragraph before the pictures.'), '<w:pPr><w:spacing w:after="360"/></w:pPr>')
+def build(path, n=4, h_pt=140, ppr=None, mark_sz=None, with_text=False, lead=True):
+    # lead=False: the first picture line starts at the top margin (absolute positions measurable)
+    body = para(text('Paragraph before the pictures.'), '<w:pPr><w:spacing w:after="360"/></w:pPr>') if lead else ''
     ppr = ppr or PPR
     def line(i):
         r = pic(i + 1, 360, h_pt)
@@ -69,10 +73,16 @@ VARIANTS = {
     'picture_only_lines_atleast.docx': dict(n=3, h_pt=100, ppr='<w:pPr><w:spacing w:after="360" w:line="240" w:lineRule="atLeast"/></w:pPr>'),
     'picture_only_lines_mark20.docx': dict(n=3, h_pt=100, ppr='<w:pPr><w:spacing w:after="360" w:line="240" w:lineRule="auto"/><w:rPr><w:sz w:val="40"/></w:rPr></w:pPr>', mark_sz=40),
     'picture_lines_with_text.docx': dict(n=3, h_pt=100, with_text=True),
+    'picture_only_lines_exact160.docx': dict(n=3, h_pt=100, lead=False, ppr='<w:pPr><w:spacing w:after="360" w:line="3200" w:lineRule="exact"/></w:pPr>'),
+    'picture_only_lines_exact12.docx': dict(n=3, h_pt=100, lead=False, ppr='<w:pPr><w:spacing w:after="360" w:line="240" w:lineRule="exact"/></w:pPr>'),
+    'picture_only_lines_atleast160.docx': dict(n=3, h_pt=100, lead=False, ppr='<w:pPr><w:spacing w:after="360" w:line="3200" w:lineRule="atLeast"/></w:pPr>'),
+    'picture_lines_with_text_exact160.docx': dict(n=3, h_pt=100, lead=False, with_text=True, ppr='<w:pPr><w:spacing w:after="360" w:line="3200" w:lineRule="exact"/></w:pPr>'),
 }
 
 if __name__ == '__main__':
     import os
     out = sys.argv[1] if len(sys.argv) > 1 else '.'
+    only = sys.argv[2:]  # optional: build only these names
     for name, kw in VARIANTS.items():
-        build(os.path.join(out, name), **kw)
+        if not only or name in only:
+            build(os.path.join(out, name), **kw)
