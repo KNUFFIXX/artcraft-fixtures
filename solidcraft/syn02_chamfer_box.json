@@ -1,0 +1,38 @@
+{
+ "commands": [
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 40,
+    "width": 30,
+    "height": 20,
+    "corner": [
+     0,
+     0,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Block"
+   }
+  },
+  {
+   "command": "solid.chamfer",
+   "params": {
+    "edges": [
+     [
+      20,
+      0,
+      20
+     ],
+     [
+      20,
+      30,
+      20
+     ]
+    ],
+    "distance": 2,
+    "body": "Block"
+   }
+  }
+ ]
+}
