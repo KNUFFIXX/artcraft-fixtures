@@ -1,0 +1,53 @@
+{
+ "commands": [
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 1200,
+    "width": 100,
+    "height": 100,
+    "corner": [
+     0,
+     0,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Holz Balken"
+   }
+  },
+  {
+   "command": "solid.cylinder",
+   "params": {
+    "diameter": 12,
+    "height": 100,
+    "base": [
+     600,
+     50,
+     0
+    ],
+    "axis": "Z",
+    "operation": "new",
+    "body_name": "Bohrung"
+   }
+  },
+  {
+   "command": "solid.combine",
+   "params": {
+    "target": "Holz Balken",
+    "tools": [
+     "Bohrung"
+    ],
+    "operation": "cut"
+   }
+  },
+  {
+   "command": "appearance.assign",
+   "params": {
+    "bodies": [
+     "Holz Balken"
+    ],
+    "color": "#a0522d"
+   }
+  }
+ ]
+}
