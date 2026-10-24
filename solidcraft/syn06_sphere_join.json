@@ -1,0 +1,42 @@
+{
+ "commands": [
+  {
+   "command": "solid.sphere",
+   "params": {
+    "radius": 10,
+    "center": [
+     0,
+     0,
+     0
+    ],
+    "body_name": "Kugel",
+    "operation": "new"
+   }
+  },
+  {
+   "command": "solid.cylinder",
+   "params": {
+    "diameter": 8,
+    "height": 30,
+    "base": [
+     0,
+     0,
+     0
+    ],
+    "axis": "Z",
+    "operation": "new",
+    "body_name": "Stab"
+   }
+  },
+  {
+   "command": "solid.combine",
+   "params": {
+    "target": "Kugel",
+    "tools": [
+     "Stab"
+    ],
+    "operation": "join"
+   }
+  }
+ ]
+}
