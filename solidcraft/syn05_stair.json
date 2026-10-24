@@ -1,0 +1,94 @@
+{
+ "commands": [
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 1000,
+    "width": 280,
+    "height": 180,
+    "corner": [
+     0,
+     0,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Stufe_1"
+   }
+  },
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 1000,
+    "width": 280,
+    "height": 360,
+    "corner": [
+     0,
+     280,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Stufe_2"
+   }
+  },
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 1000,
+    "width": 280,
+    "height": 540,
+    "corner": [
+     0,
+     560,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Stufe_3"
+   }
+  },
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 1000,
+    "width": 280,
+    "height": 720,
+    "corner": [
+     0,
+     840,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Stufe_4"
+   }
+  },
+  {
+   "command": "solid.cylinder",
+   "params": {
+    "diameter": 10,
+    "height": 240,
+    "base": [
+     -120,
+     140,
+     90
+    ],
+    "axis": "X",
+    "operation": "new",
+    "body_name": "Anker_1"
+   }
+  },
+  {
+   "command": "solid.cylinder",
+   "params": {
+    "diameter": 10,
+    "height": 240,
+    "base": [
+     -120,
+     420,
+     90
+    ],
+    "axis": "X",
+    "operation": "new",
+    "body_name": "Anker_2"
+   }
+  }
+ ]
+}
