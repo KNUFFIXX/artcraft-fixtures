@@ -1,0 +1,33 @@
+{
+ "commands": [
+  {
+   "command": "solid.box",
+   "params": {
+    "length": 60,
+    "width": 40,
+    "height": 30,
+    "corner": [
+     0,
+     0,
+     0
+    ],
+    "operation": "new",
+    "body_name": "Tray"
+   }
+  },
+  {
+   "command": "solid.shell",
+   "params": {
+    "faces": [
+     [
+      30,
+      20,
+      30
+     ]
+    ],
+    "thickness": 2,
+    "body": "Tray"
+   }
+  }
+ ]
+}
