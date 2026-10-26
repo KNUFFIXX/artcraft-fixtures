@@ -49,6 +49,7 @@ Found in a run of GridCraft 0.5.0 over 663 real-world workbooks (12 Oct 2026), r
 | `gridcraft/gc_spill_single.xlsx` | the spill operator on a dynamic-array formula that currently returns one value (`ROWS(C1#)`, `SUM(C1#)`) gives `#REF!` | [storytold/gridcraft#1491](https://github.com/storytold/gridcraft/issues/1491) |
 | `gridcraft/gc_sumproduct_if_da.xlsx` | `SUMPRODUCT(IF(ISERROR(…)))` stored as a dynamic array is saved without `cm`, so Excel inserts `@` and shows `#VALUE!` | [storytold/gridcraft#64](https://github.com/storytold/gridcraft/issues/64) (comment) |
 | `gridcraft/gc_table_filter_da.xlsx` | a dynamic-array formula in a table column (`FILTER` with `[@Key]`, stored as Excel 365 stores it) that returns one value shows `#SPILL!` (0.11.1; 0.10.0 correct); written by [`make_gc_table_dynamic_array.py`](gridcraft/make_gc_table_dynamic_array.py) | [storytold/gridcraft#2335](https://github.com/storytold/gridcraft/issues/2335) |
+| `gridcraft/make_gc_xml_node_cap.py` (writes a one-sheet workbook with a 5-column table; default 110,000 rows, control 90,000) | a sheet part with more than about 1 M XML elements is cut off at open since #2413 (0.12.1): the table goes with the tail and `SUBTOTAL(109,Data[Amount])` becomes `#REF!` after a round trip; 90,000 rows pass | [storytold/gridcraft#2526](https://github.com/storytold/gridcraft/issues/2526) (comment) |
 
 ## LightCraft
 
