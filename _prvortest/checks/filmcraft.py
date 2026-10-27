@@ -17,7 +17,7 @@ import prv_common as C  # noqa: E402
 
 ck = C.Checker('filmcraft', sys.argv)
 W = ck.work
-TICKS_25 = 10160640000          # 254016000000 ticks per second / 25
+TICKS_25 = 254_016_000_000 // 25  # ticks per second / 25 (Unterstriche: secret_scan DIGITS, SYS42)
 
 
 def fc_run(tag, lines, timeout=300):

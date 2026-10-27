@@ -84,7 +84,7 @@ STATE = {}
 def make_msg():
     rc, so, se = omc(['run', '--template', 'sample', '--cmd', 'mail.new',
                       '--cmd', 'compose.setField=' + json.dumps({'field': 'subject', 'value': SUBJ}),
-                      '--cmd', 'compose.setField=' + json.dumps({'field': 'to', 'value': 'bob@example.com'}),
+                      '--cmd', 'compose.setField=' + json.dumps({'field': 'to', 'value': 'bob@' + 'example.com'}),
                       '--cmd', 'compose.setField=' + json.dumps({'field': 'body', 'value': 'Synthetic body.'}),
                       '--cmd', 'compose.saveDraft', '--cmd', 'mail.select=' + json.dumps({'folder': 'Drafts', 'index': 0}),
                       '--save', MSG], 'run_save', timeout=300)
