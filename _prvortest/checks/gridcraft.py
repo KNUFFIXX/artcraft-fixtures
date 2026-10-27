@@ -2,7 +2,8 @@
 """gridcraft.py (DRACO-AC05, 15.10.2026) - GridCraft fixture checks for the PR pre-test.
 Linux port of the GridCraft part of Scheduled_Scripts/ac-nachtest/ac_nachtest.py (same steps), plus the fixtures posted on
 15.10.2026 (#1488 #1489 #1490 #1491, comments #889 and #64). Expected values = Excel for Microsoft 365 de-DE via COM, as written
-into the fixtures (make_fixtures.py, make_gc_scoreboard_fixtures.py). Call:
+into the fixtures (make_fixtures.py, make_gc_scoreboard_fixtures.py); German fixtures (*_de.xlsx) are read with
+`--region de-DE` when the CLI has that option (27.10.2026). Call:
   python3 -I gridcraft.py <gridcraft-cli> <artcraft-fixtures/gridcraft> <out.json> [--work DIR]
 Values come from `gridcraft-cli cat --range --csv` (engine values); saves from `gridcraft-cli run --in --out`. The saved .xlsx
 files stay in the work folder for the Excel cross-check on the PC (a FIXED for a save issue needs it before posting).
@@ -25,8 +26,25 @@ def gc(args, tag, timeout=180):
     return C.run([ck.cli] + args, timeout=timeout, cwd=W, log_prefix=os.path.join(W, tag))
 
 
+_REGION = None
+
+
+def region_args(path):
+    """['--region', 'de-DE'] for the German fixtures (*_de.xlsx) when this gridcraft-cli has the option (PR #1886, 27.10.2026):
+    their expected values are Excel de-DE, so the CLI reads text the same way. Older CLIs have no flag (en-US only)."""
+    global _REGION
+    if _REGION is None:
+        rc, so, se = C.run([ck.cli, '--help'], timeout=30, cwd=W, log_prefix=os.path.join(W, 'help'))
+        _REGION = '--region' in (so + se)
+    return ['--region', 'de-DE'] if _REGION and os.path.basename(path).endswith('_de.xlsx') else []
+
+
+def region_note(name):
+    return ' (with `--region de-DE`)' if region_args(name) else ''
+
+
 def cat(path, rng, tag):
-    rc, so, se = gc(['cat', path, '--range', rng, '--csv'], tag)
+    rc, so, se = gc(['cat', path, '--range', rng, '--csv'] + region_args(path), tag)
     if rc != 0 and not so.strip():
         raise RuntimeError('cat failed (rc=%s): %s' % (rc, se.strip()[-300:]))
     return [row for row in csv.reader(io.StringIO(so))]
@@ -82,8 +100,8 @@ def values_check(name, exp, rng, known_main_bad):
         got, bad = compare(ck.fx(name), exp, 'v_' + name[:-5], rng)
         n = len(exp)
         v = 'FIXED' if not bad else ('NOT FIXED' if set(bad) == set(known_main_bad) else 'CHANGED')
-        return ('%d/%d cells like Excel' % (n - len(bad), n)) + ('' if not bad else '; differs: ' + ', '.join('%s=%s' % (k, got.get(k)) for k in bad)), v, \
-            {'got': got, 'bad': bad}
+        return ('%d/%d cells like Excel' % (n - len(bad), n)) + ('' if not bad else '; differs: ' + ', '.join('%s=%s' % (k, got.get(k)) for k in bad)) \
+            + region_note(name), v, {'got': got, 'bad': bad}
     return fn
 
 
@@ -92,7 +110,8 @@ def g889():
     exp = {'B1': 107.689, 'B2': 665, 'B3': 1, 'B4': '#VALUE!', 'C1': 107.689, 'C2': 1330, 'C3': 107.689, 'C4': 0, 'C5': 1330}
     got, bad = compare(ck.fx('gc_coerce_de.xlsx'), exp, 'g889', 'B1:C5')
     v = 'FIXED' if not bad else ('NOT FIXED' if len(bad) >= 6 else 'CHANGED')
-    return ('all 9 cells like Excel' if not bad else 'differs: ' + ', '.join('%s=%s' % (k, got[k]) for k in bad)), v, {'got': got}
+    return ('all 9 cells like Excel' if not bad else 'differs: ' + ', '.join('%s=%s' % (k, got[k]) for k in bad)) + region_note('gc_coerce_de.xlsx'), v, \
+        {'got': got}
 
 
 ck.check('gc_coerce_de.xlsx', 'gridcraft#889', 'text-to-number/date coercion with de-DE separators',
