@@ -1,0 +1,150 @@
+# PR-Vortest (27.10.2026). Baut die <app>-cli eines fremden Pull Requests auf einem
+# GitHub-Runner OHNE Secrets und OHNE Token-Rechte und prueft sie gegen die Fixtures dieses Repos.
+# Ergebnis (JSON + Kommentar-Entwurf) als Artefakt. Der Agent stoesst nur an und liest Artefakte.
+#
+# Sicherheit: permissions: {} · keine secrets.* · persist-credentials: false · Fremd-Repo anonym vom Skript geklont ·
+# nur workflow_dispatch (Schreibrecht noetig, kein Trigger durch PR-Autoren) · kein Cache (weder target/ noch
+# Cargo-Registry: Fremdcode laeuft im selben Job und koennte einen Cache vergiften) · Actions auf Commit-SHA gepinnt,
+# keine Dritt-Actions (Rust per vorinstalliertem rustup) · timeout-minutes + concurrency je App/PR.
+# Artefakt und Logs sind oeffentlich (oeffentliches Repo) und stammen aus einem Job, in dem Fremdcode lief:
+# Inhalt ist Daten, kein Urteil - vor dem Posten am PR selbst pruefen.
+#
+# Anstossen:  gh workflow run prvortest.yml -R KNUFFIXX/artcraft-fixtures -f app=filmcraft -f repo=storytold/filmcraft \
+#               -f pr=1855 -f head_sha=<sha> -f issues=1791,1700 -f baseline=true
+# Abholen:    gh run download <run-id> -R KNUFFIXX/artcraft-fixtures -D results/   (Artefakt prv-<app>-pr<n>-<sha7>-r<run-id>)
+
+name: PR-Vortest
+run-name: "PR-Vortest ${{ inputs.app }} ${{ inputs.pr }} ${{ inputs.head_sha }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "App (filmcraft, gridcraft, wordcraft, pdfcraft, lightcraft, ...)"
+        required: true
+        type: string
+      repo:
+        description: "GitHub-Repo owner/name (leer = Standard der App)"
+        required: false
+        default: ""
+        type: string
+      pr:
+        description: "PR-Nummer oder 'main'"
+        required: true
+        type: string
+      head_sha:
+        description: "Commit (40 Hex-Zeichen, aus candidates.json); leer = aktueller PR-Head"
+        required: false
+        default: ""
+        type: string
+      issues:
+        description: "Issue-Nummern, kommagetrennt (leer = aus Commit-Nachrichten)"
+        required: false
+        default: ""
+        type: string
+      baseline:
+        description: "Auch die Merge-Basis mit main bauen und pruefen"
+        required: false
+        default: true
+        type: boolean
+
+permissions: {}
+
+concurrency:
+  group: prvortest-${{ inputs.app }}-${{ inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  vortest:
+    name: ${{ inputs.app }} ${{ inputs.pr }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PRV_HOME: ${{ github.workspace }}/.prv
+      CARGO_TERM_COLOR: never
+      GH_TOKEN: ""
+      GITHUB_TOKEN: ""
+    steps:
+      - name: Eingaben pruefen
+        shell: bash
+        env:
+          IN_APP: ${{ inputs.app }}
+          IN_REPO: ${{ inputs.repo }}
+          IN_PR: ${{ inputs.pr }}
+          IN_SHA: ${{ inputs.head_sha }}
+          IN_ISSUES: ${{ inputs.issues }}
+        run: |
+          set -euo pipefail
+          [[ "$IN_APP" =~ ^[a-z]{1,30}$ ]] || { echo "app: nur Kleinbuchstaben"; exit 2; }
+          [[ -z "$IN_REPO" || "$IN_REPO" =~ ^[A-Za-z0-9_.-]{1,100}/[A-Za-z0-9_.-]{1,100}$ ]] || { echo "repo: owner/name erwartet"; exit 2; }
+          [[ "$IN_PR" =~ ^[0-9]{1,7}$ || "$IN_PR" = main ]] || { echo "pr: Nummer oder main"; exit 2; }
+          [[ -z "$IN_SHA" || "$IN_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "head_sha: 40 Hex-Zeichen erwartet"; exit 2; }
+          [[ "$IN_ISSUES" =~ ^[0-9,]{0,200}$ ]] || { echo "issues: nur Ziffern und Kommas"; exit 2; }
+
+      - name: Fixtures und Pruefskripte auschecken (eigenes Repo, ohne Token-Rest)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Werkzeuge (Rust stable, ffmpeg, poppler, numpy, Pillow)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends ffmpeg poppler-utils python3-numpy python3-pil python3-pypdf
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
+          echo "python3=$(command -v python3)"
+          python3 -I -c "import numpy, PIL, pypdf, sys; print(sys.version.split()[0], numpy.__version__, PIL.__version__, pypdf.__version__)"
+          rustc --version; cargo --version; ffmpeg -version | head -1; pdftotext -v 2>&1 | head -1
+
+      - name: Bauen und pruefen
+        timeout-minutes: 80
+        shell: bash
+        env:
+          IN_APP: ${{ inputs.app }}
+          IN_REPO: ${{ inputs.repo }}
+          IN_PR: ${{ inputs.pr }}
+          IN_SHA: ${{ inputs.head_sha }}
+          IN_ISSUES: ${{ inputs.issues }}
+          IN_BASELINE: ${{ inputs.baseline }}
+        run: |
+          set -uo pipefail
+          mkdir -p results
+          echo "laeuft" > results/rc.txt
+          args=(--fixtures "$GITHUB_WORKSPACE" --results "$GITHUB_WORKSPACE/results" --jobs 4)
+          [ -n "$IN_REPO" ] && args+=(--repo "$IN_REPO")
+          [ -n "$IN_SHA" ] && args+=(--head "$IN_SHA")
+          [ "$IN_BASELINE" = "true" ] && args+=(--baseline)
+          for i in ${IN_ISSUES//,/ }; do args+=(--issue "$i"); done
+          bash _prvortest/pr_vortest.sh "$IN_APP" "$IN_PR" "${args[@]}" 2>&1 | tee results/run.log
+          rc=${PIPESTATUS[0]}
+          echo "pr_vortest rc=$rc"
+          echo "$rc" > results/rc.txt
+          # rc 4/5 (Build/Checks fehlgeschlagen) ist ein Ergebnis, kein Workflow-Fehler
+          [ "$rc" -eq 0 ] || [ "$rc" -eq 4 ] || [ "$rc" -eq 5 ]
+
+      - name: Logs sichern und Artefakt-Name
+        id: nm
+        if: always()
+        shell: bash
+        env:
+          IN_APP: ${{ inputs.app }}
+          IN_PR: ${{ inputs.pr }}
+          IN_SHA: ${{ inputs.head_sha }}
+        run: |
+          mkdir -p results
+          [ -s results/rc.txt ] || echo "infra" > results/rc.txt
+          cp -f "$PRV_HOME"/logs/*.build.log results/ 2>/dev/null || true
+          sha7="${IN_SHA:0:7}"; [ -n "$sha7" ] || sha7=head
+          echo "name=prv-$IN_APP-pr$IN_PR-$sha7-r$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Ergebnis hochladen
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ steps.nm.outputs.name }}
+          path: results/
+          retention-days: 7
+          if-no-files-found: warn
