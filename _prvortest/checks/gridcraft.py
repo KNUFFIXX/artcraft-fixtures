@@ -233,6 +233,11 @@ ck.check('gc_text_codes_de.xlsx', 'gridcraft#889', 'TEXT() with German format co
          values_check('gc_text_codes_de.xlsx', {'B1': '16.10.2023', 'B2': '2023-10-16', 'B3': 'Montag', 'B4': 'Oktober 2023', 'B5': '1.234,50',
                                                 'B6': '1234,5', 'B7': 'yyyy-00-dd'}, 'B1:B7', ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']),
          aspect='values')
+# THV-SYS43 28.10.2026: Excel truth measured on THV (de-DE, DateOrder=1, DateSep='.'), probe from DRACO-AC17
+ck.check('gc_probe_dates_de.xlsx', 'gridcraft#889', 'German date text in YEAR/DATEVALUE/TIMEVALUE/MONTH and Text+0',
+         'B1=2021 C1=44227 D1=44227 B2=45215 C2=0.604166667 D2=10', 'German date text not parsed (main without --region)',
+         values_check('gc_probe_dates_de.xlsx', {'B1': 2021, 'C1': 44227, 'D1': 44227, 'B2': 45215, 'C2': 0.604166667, 'D2': 10},
+                      'B1:D2', ['B1', 'C1', 'D1', 'B2', 'C2', 'D2']), aspect='values')
 
 WS_F = {'B1': 'IF(A1>0,\n  "positive",\n  "not positive")', 'B2': '_xlfn.LET(\n  _xlpm.x, A1,\n  _xlpm.y, A2,\n  _xlpm.x + _xlpm.y\n)',
         'B3': 'SUM(\n  A1,\n  A2\n)', 'B4': 'A1 + A2 * 2', 'B5': 'SUM( A1:A2 )'}
