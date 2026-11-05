@@ -2,7 +2,8 @@
 """filmcraft.py (THV-AC03, 14.10.2026) - FilmCraft fixture checks for the PR pre-test.
 Linux port of Tools/ac_film_nachtest.ps1 (same steps, same thresholds), for a self-built filmcraft-cli.
 Call: python3 -I filmcraft.py <filmcraft-cli> <artcraft-fixtures/filmcraft> <out.json> [--work DIR]
-Issues: storytold/filmcraft #1700 (frame rate from ms-rounded timestamps), #1701 (5.1 in MP4 read as stereo),
+Issues: storytold/filmcraft #1700 (frame rate from ms-rounded timestamps), #1701 (5.1 AC-3/E-AC-3 in MP4 read as stereo),
+#4258 (AAC 5.1 with a program config element in MP4 read as stereo; split off #1701 on 2026-11-04),
 #1702 (empty pixel format), #1791 (SCC export: close caption pops on late), #1792 (EDL round trip at 24 fps).
 known_main = the values of the v0.7.2 Windows release (Nachtest 14.10.2026), as in the issues."""
 import json
@@ -199,10 +200,10 @@ def c1701(name, control):
     return fn
 
 
-for n, known in [('surround51_ac3.mp4', 'probe 2 ch; centre in L -139.8 dB (silent)'),
-                 ('surround51_eac3.mp4', 'probe 2 ch; centre in L -132.2 dB (silent)'),
-                 ('surround51side_aac_pce.mp4', 'probe 2 ch; centre in L -133.0 dB (silent)')]:
-    ck.check(n, 'filmcraft#1701', '5.1 in MP4: channel count and centre channel', '6 ch; centre tone present (-6..0 dB vs FL)',
+for n, iss, known in [('surround51_ac3.mp4', 'filmcraft#1701', 'probe 2 ch; centre in L -139.8 dB (silent)'),
+                      ('surround51_eac3.mp4', 'filmcraft#1701', 'probe 2 ch; centre in L -132.2 dB (silent)'),
+                      ('surround51side_aac_pce.mp4', 'filmcraft#4258', 'probe 2 ch; centre in L -133.0 dB (silent)')]:
+    ck.check(n, iss, '5.1 in MP4: channel count and centre channel', '6 ch; centre tone present (-6..0 dB vs FL)',
              known, c1701(n, False))
 ck.check('surround51_ac3.mov', 'filmcraft#1701', '5.1 in MOV (control, same stream)', '6 ch; centre tone present',
          'probe 6 ch; centre in L -3.1 dB (correct)', c1701('surround51_ac3.mov', True), role='control')
