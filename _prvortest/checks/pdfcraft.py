@@ -6,7 +6,8 @@ Linux port of the PdfCraft part of Scheduled_Scripts/ac-nachtest/ac_nachtest.py 
 Needs PIL and pypdf (both in the container). #1698 needs the public oss-fuzz file from the pdfplumber test suite; it is
 downloaded once into $PRV_HOME/ext (or <work>/../ext) and checked by sha256 - without network that check is ERROR.
 known_main = PdfCraft 0.8.0 (Windows x64 release, AC Nachtest 15.10.2026) or what the issue reported.
-Issues: storytold/pdfcraft #1467 #1468 #1469 #1470 #1698 #1699 #1700 #1761 #1769 #1770 #2456 #2457."""
+Issues: storytold/pdfcraft #1467 #1468 #1469 #1470 #1698 #1699 #1700 #1761 #1769 #1770 #2456 #2457 #4017 #5641.
+known_main of #4017 and #5641: the release named in the issue report."""
 import hashlib
 import json
 import os
@@ -305,5 +306,61 @@ def c4017():
 
 ck.check('flatten_empty_field_no_ap.pdf', 'pdfcraft#4017', 'doc_flatten removes empty text fields without an appearance stream',
          '0 fields after flatten + save', '2 (empty_no_ap_1, empty_no_ap_2; 0.11.0)', c4017, aspect='run script')
+
+# ---------- #5641 ----------
+# text_overlap_sizes.pdf: rows A = 8 pt "Walter Example" on a 10 pt dot leader, rows B = 11 pt space glyphs over an 8 pt
+# line, each shifted by -3 .. +3 pt. A row is intact when the text between its label and the next label holds exactly the
+# expected words in order (dot-only tokens of the leader are ignored, so the value may stand before or after the dots).
+# Splicing the run into the line glyph by glyph breaks the words, e.g. ".W...a..lt.e..r. E..x..a.m...p.l.e....".
+ROWS_5641 = ['%+.1f' % d for d in (-3, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 3)]
+KNOWN_5641 = ['A-1.5', 'A-1.0', 'A+2.0', 'A+3.0', 'B-3.0', 'B+1.0', 'B+1.5']   # rows spliced in 0.16.1
+LABEL_5641 = re.compile(r'([AB])([+-]\d\.\d):?(?=\s)')
+ROWSTART_5641 = re.compile(r'(?m)^\s*[AB]\s*[+-]')   # start of a row line, also with a spliced label
+
+
+def words_5641(seg):
+    return [w for w in seg.split() if w.strip('.')]
+
+
+def bad_rows_5641(t):
+    found = {}
+    marks = list(LABEL_5641.finditer(t))
+    for i, m in enumerate(marks):
+        nxt = ROWSTART_5641.search(t, m.end())
+        end = min(marks[i + 1].start() if i + 1 < len(marks) else len(t), nxt.start() if nxt else len(t))
+        found.setdefault(m.group(1) + m.group(2), t[m.end():end])
+    bad = []
+    for kind, want in (('A', ['Walter', 'Example']), ('B', ['quick', 'brown', 'fox', 'jumps'])):
+        for r in ROWS_5641:
+            seg = found.get(kind + r)
+            if seg is None or words_5641(seg) != want:
+                bad.append(kind + r)
+    return bad
+
+
+def c5641_rows():
+    t = text(ck.fx('text_overlap_sizes.pdf'), 'c5641_rows')
+    bad = bad_rows_5641(t)
+    v = 'FIXED' if not bad else ('NOT FIXED' if bad == KNOWN_5641 else 'CHANGED')
+    return '%d of 22 rows keep their words%s' % (22 - len(bad), (' (spliced: %s)' % ', '.join(bad)) if bad else ''), v, \
+        {'bad': bad, 'text': t[:1600]}
+
+
+def c5641_field():
+    t = text(ck.fx('text_field_on_leader.pdf'), 'c5641_field')
+    m = re.search(r'Name:(.*?)Control line', t, re.S)
+    w = words_5641(m.group(1)) if m else None
+    ctl = 'Control line without anything on top of it' in re.sub(r'\s+', ' ', t)
+    if w == ['Walter', 'Example'] and ctl:
+        return 'field value "Walter Example" kept on the leader line', 'FIXED', {'text': t[:300]}
+    spliced = bool(m) and ctl and 'Walter' not in w and re.search(r'W\.+a', m.group(1)) is not None
+    return 'field line: %r' % re.sub(r'\s+', ' ', (m.group(1) if m else t)).strip()[:90], 'NOT FIXED' if spliced else 'CHANGED', \
+        {'text': t[:300]}
+
+
+ck.check('text_overlap_sizes.pdf', 'pdfcraft#5641', 'a glyph run of another size drawn over a line keeps its words (22 rows)',
+         '22 of 22 rows (0.15.0)', '15 of 22, A-1.5 A-1.0 A+2.0 A+3.0 B-3.0 B+1.0 B+1.5 spliced (0.16.1)', c5641_rows, aspect='text')
+ck.check('text_field_on_leader.pdf', 'pdfcraft#5641', 'AcroForm field value drawn on a dot leader keeps its words',
+         '"Name: ... Walter Example" (0.15.0)', '"Name: .W..a..lt.e..r. .E..x.a..m..p..le..." (0.16.1)', c5641_field, aspect='text')
 
 ck.write({'known_main_label': 'PdfCraft 0.8.0', 'known_main_source': 'PdfCraft 0.8.0 Windows x64 release (AC Nachtest 15.10.2026) and the issue reports'})
